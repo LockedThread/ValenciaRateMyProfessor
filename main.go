@@ -19,62 +19,87 @@ func main() {
 	fmt.Printf("\nSize: %d bytes", len(data))
 	fmt.Printf("\nData: %s", data)
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(data)))
+	ParseTable(string(data))
+}
+
+func ParseTable(data string) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(data))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Find the review items
-	doc.Find("tr td").Each(func(i int, s *goquery.Selection) {
-		if i%20 == 0 {
+	table := doc.Find("table")
+
+	table.Find("tr").Each(func(i int, rowSelection *goquery.Selection) {
+		fmt.Printf("\ni=%d", i)
+		if i < 2 {
 			return
 		}
 
-		if s.HasClass("a") {
-			return
-		}
+		var course model.Course
 
-		fmt.Printf("i=%d", i)
-		fmt.Printf("\nlength= %d", s.Length)
-		if s.Length() > 1 {
-			return
-		}
+		tableData := rowSelection.Find("td")
 
-		fmt.Printf("\ntext=%s", s.Text())
+		cont := true
+		tableData.Each(func(i int, selection *goquery.Selection) {
+			text := selection.Text()
 
-		var attrCount = 0
-
-		find := s.Find("a")
-		if find != nil {
-			if len(find.Nodes) > 0 {
-				if len(find.Nodes[0].Attr) > 0 {
-					attrCount = len(find.Nodes[0].Attr)
+			if i == 0 {
+				if len(text) == 2 {
+					cont = false
+					return
+				} else {
+					cont = true
 				}
 			}
-		}
+			if cont == false {
+				return
+			}
+			//fmt.Printf("\ntext=%s", text)
 
-		fmt.Printf("\nattrCount=%d", attrCount)
+			switch i {
+			case 1:
+				course.Course = text
+				break
+			case 2:
+				course.Subject = text
+				break
+			case 3:
+				course.CRN = text
+				break
+			case 4:
+				break
+			case 5:
+				course.CampusID = text
+				break
+			case 6:
+				atoi, err := strconv.ParseFloat(text, 64)
+				if err != nil {
+					log.Fatal(err)
+				}
+				course.Credits = atoi
+				break
+			case 7:
+				course.Title = text
+				break
+			case 16:
+				course.Instructor = text
+				break
+			}
+		})
 
-		if attrCount > 1 {
+		if len(course.Title) == 0 {
 			return
 		}
 
-		fmt.Printf("\n")
-		credits, err := strconv.Atoi(s.Nodes[5].Data)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		course := model.Course{
-			CRN:        s.Nodes[0].Data,
-			Subject:    s.Nodes[1].Data,
-			Course:     s.Nodes[2].Data,
-			CampusID:   s.Nodes[4].Data,
-			Title:      s.Nodes[6].Data,
-			Credits:    credits,
-			Honors:     false,
-			Instructor: s.Nodes[15].Data,
-		}
-		fmt.Printf("%s", course)
+		fmt.Printf("\ncourse=%s", course)
 	})
+}
+
+func GetTableRow() {
+
+}
+
+func ParseTableRow() {
+
 }
