@@ -20,7 +20,7 @@ type Course struct {
 	Course     string
 	Title      string
 	CampusID   string
-	Credits    int
+	Credits    float64
 	Honors     bool
 	Instructor string
 }
