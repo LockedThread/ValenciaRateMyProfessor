@@ -19,14 +19,27 @@ func main() {
 	fmt.Printf("\nSize: %d bytes", len(data))
 	fmt.Printf("\nData: %s", data)
 
-	ParseTable(string(data))
+	courseArray := ParseTable(string(data))
+
+	courseInstructorMap := make(map[string]model.Course)
+
+	for i := range courseArray {
+		course := courseArray[i]
+		courseInstructorMap[course.Instructor] = course
+	}
+
+	for _ = range courseInstructorMap {
+
+	}
 }
 
-func ParseTable(data string) {
+func ParseTable(data string) []model.Course {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(data))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	courses := make([]model.Course, 1)
 
 	table := doc.Find("table")
 
@@ -36,8 +49,10 @@ func ParseTable(data string) {
 		}
 
 		tableData := rowSelection.Find("td")
-		GetCourse(tableData)
+
+		courses = append(courses, GetCourse(tableData))
 	})
+	return courses
 }
 
 func GetCourse(tableData *goquery.Selection) (course model.Course) {
@@ -50,7 +65,6 @@ func GetCourse(tableData *goquery.Selection) (course model.Course) {
 		return
 	}
 
-	fmt.Printf("\ncourse=%s", course)
 	return course
 }
 
