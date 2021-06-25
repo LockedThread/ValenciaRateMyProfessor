@@ -2,14 +2,17 @@ package model
 
 import (
 	"fmt"
-	"log"
 	"strings"
 )
 
 type FullName struct {
-	lastName      string
-	middleInitial string
 	firstName     string
+	middleInitial string
+	lastName      string
+}
+
+func (f FullName) String() string {
+	return "{" + f.FormattedString() + "}"
 }
 
 func (f FullName) FormattedString() string {
@@ -19,67 +22,52 @@ func (f FullName) FormattedString() string {
 	return fmt.Sprintf("%s %s", f.firstName, f.lastName)
 }
 
+func TrimSpaces(s string) string {
+	var fullString string
+	for i := range s {
+		cursor := s[i]
+		if cursor == ' ' {
+			if s[i+1] == ' ' {
+				continue
+			}
+		}
+		fullString += string(cursor)
+	}
+	return fullString
+}
+
 func GetFullNameFromString(name string) FullName {
 	name = strings.Replace(name, " (P)", "", 1)
 	name = strings.TrimSpace(name)
-	//nameLength := len(name)
+	name = TrimSpaces(name)
 
 	fullNameStruct := FullName{}
 
 	split := strings.Split(name, " ")
 
-	cursorIndex := 0
-	for i := range split {
-		cursor := split[i]
-		if len(cursor) > 0 {
-			switch cursorIndex {
-			case 0:
-				fullNameStruct.firstName = cursor
-				break
-			case 1:
-				fullNameStruct.middleInitial = cursor
-				break
-			case 2:
-				fullNameStruct.lastName = cursor
-				break
-			default:
-				log.Fatalf("Name fragment index too long, %s\n", cursor)
-			}
-			cursor = ""
-			cursorIndex++
+	if len(split) == 1 {
+		fullNameStruct.firstName = split[0]
+		return fullNameStruct
+	}
+
+	splitLength := len(split)
+
+	fullNameStruct.firstName = split[0]
+	fullNameStruct.lastName = split[splitLength-1]
+
+	for i := 1; i < splitLength-1; i++ {
+		if i == splitLength-2 {
+			fullNameStruct.middleInitial += split[i]
+
+		} else {
+			fullNameStruct.middleInitial += split[i] + " "
 		}
 	}
 
-	/*
-		currentFragmentIndex := 0
-		var cursor string
-		for i := range name {
-			character := name[i]
+	if fullNameStruct.FormattedString() != name {
+		fmt.Printf("name=%s\n", name)
+		fmt.Printf("FormattedString=%s\n", fullNameStruct.FormattedString())
+	}
 
-			currentIsSpace := character == ' '
-
-			if currentIsSpace {
-				if len(cursor) != 0 {
-					switch currentFragmentIndex {
-					case 0:
-						fullNameStruct.firstName = cursor
-						log.Println(cursor)
-						break
-					case 1:
-						fullNameStruct.middleInitial = cursor
-						break
-					case 2:
-						fullNameStruct.lastName = cursor
-						break
-					default:
-						log.Fatalln("Name fragment index too long")
-					}
-					currentFragmentIndex++
-					cursor = ""
-				}
-				continue
-			}
-			cursor += string(character)
-		}*/
 	return fullNameStruct
 }
