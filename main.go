@@ -22,11 +22,12 @@ func main() {
 
 	for i := range courseArray {
 		course := courseArray[i]
-		courseInstructorMap[course.Instructor] = course
+		courseInstructorMap[course.Professor.FormattedString()] = course
 	}
 
 	for instructor := range courseInstructorMap {
 		fmt.Printf("%s %s\n", instructor, courseInstructorMap[instructor])
+		//fmt.Printf("%s\n", courseInstructorMap[instructor].Professor.FullName)
 	}
 }
 
@@ -115,7 +116,7 @@ func ParseTableRow(course *model.Course, cont *bool, i int, selection *goquery.S
 		course.Title = text
 		break
 	case 16:
-		course.Instructor = text
+		course.Professor = model.Professor{FullName: model.GetFullNameFromString(text)}
 		break
 	}
 }
