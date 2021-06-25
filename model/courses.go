@@ -17,7 +17,7 @@ var Campuses = map[string]string{
 type Course struct {
 	CRN        string
 	Subject    string
-	Course     string
+	Course     int
 	Title      string
 	CampusID   string
 	Credits    float64
@@ -26,7 +26,7 @@ type Course struct {
 }
 
 func (c Course) String() string {
-	return fmt.Sprintf("CRN: %s, Subject: %s, Course: %s, Title: %s, CampusID: %s, Credits: %d, Honors: %t, Instructor: %s", c.CRN, c.Subject, c.Course, c.Title, c.CampusID, c.Credits, c.Honors, c.Instructor)
+	return fmt.Sprintf("CRN: %s, Subject: %s, Course: %d, Title: %s, CampusID: %s, Credits: %f, Honors: %t, Instructor: %s", c.CRN, c.Subject, c.Course, c.Title, c.CampusID, c.Credits, c.Honors, c.Instructor)
 }
 
 func (c Course) CampusName() {
