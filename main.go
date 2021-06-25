@@ -15,9 +15,6 @@ func main() {
 	if err != nil {
 		log.Panicf("failed reading data from file: %s", err)
 	}
-	fmt.Printf("\nFile Name: %s", "example.html")
-	fmt.Printf("\nSize: %d bytes", len(data))
-	fmt.Printf("\nData: %s", data)
 
 	courseArray := ParseTable(string(data))
 
@@ -28,8 +25,8 @@ func main() {
 		courseInstructorMap[course.Instructor] = course
 	}
 
-	for _ = range courseInstructorMap {
-
+	for instructor := range courseInstructorMap {
+		fmt.Printf("%s %s\n", instructor, courseInstructorMap[instructor])
 	}
 }
 
@@ -85,7 +82,16 @@ func ParseTableRow(course *model.Course, cont *bool, i int, selection *goquery.S
 
 	switch i {
 	case 1:
-		course.Course = text
+		text = strings.Replace(text, "\n", "", -1)
+		text = strings.Replace(text, "\r", "", -1)
+		text = strings.Replace(text, " ", "", -1)
+
+		atoi, err := strconv.ParseInt(text, 0, 64)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		course.Course = int(atoi)
 		break
 	case 2:
 		course.Subject = text
