@@ -7,7 +7,7 @@ type Professor struct {
 }
 
 func (p Professor) FormattedString() string {
-	return fmt.Sprintf("%s", p.FullName)
+	return p.FullName.FormattedString()
 }
 
 func (p Professor) String() string {
